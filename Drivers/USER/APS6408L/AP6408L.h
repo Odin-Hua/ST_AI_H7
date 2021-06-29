@@ -2,6 +2,14 @@
 #define __AP6408L_H_
 #include "main.h"
 
+enum DQS_Strength_e
+{
+	Half,
+	One_Fourth,
+	One_Eighth,
+	One_Sixteenth
+};
+
 /*define*/
 #define READ_CMD                                0x00
 #define READ_LINEAR_BURST_CMD                   0x20
@@ -46,5 +54,5 @@ void PsramMapFastRead_U8(uint8_t* buffer, uint32_t addr, uint32_t size);
 void PsramMapFastWrite_U16(uint16_t* buffer, uint32_t addr, uint32_t size);
 void PsramMapFastWrite_U32(uint32_t* buffer, uint32_t addr, uint32_t size);
 void DLYB_OCTOSPI1_Calibration(uint8_t phase);
-
+void Psram_Set_DQS(enum DQS_Strength_e DQS_Strength);
 #endif

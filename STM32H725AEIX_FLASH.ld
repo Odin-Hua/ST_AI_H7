@@ -148,7 +148,7 @@ SECTIONS
     . = ALIGN(4);
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
-  } >RAM
+  } >RAM_D1
   
 
   /* User_heap_stack section, used to check that there is enough RAM left */

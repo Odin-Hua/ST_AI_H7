@@ -71,7 +71,6 @@ static void MPU_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 static Frame_TypeDef frame = {
 		.buffer = OCTOSPI1_BASE,
 		.length = 800*480*2,
@@ -84,7 +83,7 @@ static OV2640_TypeDef OV2640 = {
 		.i2c = &hi2c4,
 		.frame = &frame
 };
-extern const unsigned char gImage_LCD_image[192000];
+
 /* USER CODE END 0 */
 
 /**
@@ -137,26 +136,13 @@ int main(void)
   MX_IWDG1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
   HAL_IWDG_Refresh(&hiwdg1);
-  DLYB_OCTOSPI1_Calibration(2);		/*校验延迟模块*/
+  DLYB_OCTOSPI1_Calibration(1);		/*校验延迟模块*/
   HAL_IWDG_Refresh(&hiwdg1);
-#if 1		/*初始化PSRAM，修改MR0[1:0]，使DQS斜率变缓，保证A/DQ[7:0]上数据稳�????*/
-  uint8_t reg[2] = {0x00,0x00};
-  uint8_t regs;
-  regs = 0x08;
-  while(reg[0] != 0x08)
-  {
-	  HAL_IWDG_Refresh(&hiwdg1);
-	  PsramRegWrite(&regs,0);
-	  HAL_Delay(100);
-	  HAL_IWDG_Refresh(&hiwdg1);
-	  PsramRegRead(reg,0);
-  }
-  LOG("0 : %02x\r\n1 : %02x\r\n",reg[0],reg[1]);
+  Psram_Set_DQS(Half);				/*设置PSRAM的DQS信号参数*/
   HAL_Delay(100);
 
-#endif
   HAL_IWDG_Refresh(&hiwdg1);
   EnableMemMapped();
   HAL_Delay(200);
@@ -184,7 +170,7 @@ int main(void)
 	  HAL_Delay(500);
 	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
 	  HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_Delay(100);
+	  HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }

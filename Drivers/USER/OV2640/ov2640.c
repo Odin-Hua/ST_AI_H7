@@ -2389,11 +2389,17 @@ void OV2640_DMA_Config(uint8_t *DMA_Memory0BaseAddr, uint32_t DMA_BufferSize)
   * @param  None
   * @retval None
   */
-int i = 0;
+unsigned int tick = 0;
+unsigned int num = 0;
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
 	HAL_IWDG_Refresh(&hiwdg1);
-	LCD_ShowString_RGB565(640,460,240,16,16,"This is String Text");
+	LCD_ShowString_RGB565(470,445,300,32,32,"This is String Text");
+	if(num == 0)	tick = HAL_GetTick();
+	else if(num == 15)	tick = HAL_GetTick() - tick;
+	else if(num == 16)	LOG("tick is %d\r\n",tick);
+	num ++;
+	LOG("frame : %d\r\n",num);
 	OV2640_DMA_Config(_OV2640->frame->buffer, (_OV2640->frame->length)/4);
 }
 
@@ -2407,7 +2413,6 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
   */
 static void I2Cx_Error(void)
 {
-
   HAL_I2C_DeInit(_OV2640->i2c);
   if (HAL_I2C_GetState(_OV2640->i2c) == HAL_I2C_STATE_RESET)
     {

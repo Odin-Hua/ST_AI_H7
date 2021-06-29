@@ -22,7 +22,6 @@
 
 /* USER CODE BEGIN 0 */
 #include "LOG.h"
-extern uint8_t buf[400*240*2];
 /* USER CODE END 0 */
 
 LTDC_HandleTypeDef hltdc;

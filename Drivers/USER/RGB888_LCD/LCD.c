@@ -26,7 +26,7 @@ void LCD_Clear_DMA2D_RGB888(uint32_t LayerIndex, void *pDst, uint32_t xSize,uint
 void LCD_Draw_DMA2D_RGB888(uint32_t LayerIndex, void *pDst, uint32_t xSize,uint32_t ySize, uint32_t OffLine, uint32_t ColorIndex)
 {
 	hdma2d.Init.Mode = DMA2D_M2M;
-	hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB888;
+	hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB565;
 	hdma2d.Init.OutputOffset = 0;
 	hdma2d.Instance = DMA2D;
 
@@ -58,7 +58,7 @@ void LCD_Clear_RGB565(uint16_t x_start,uint16_t y_start,uint16_t x_end,uint16_t 
 
 void LCD_Draw_Point_RGB565(uint16_t x,uint16_t y,uint16_t colour)
 {
-	__IO uint16_t* addr = (__IO uint16_t*)(OCTOSPI1_BASE + (y*800 + x)*2 );
+	__IO uint16_t* addr = (__IO uint16_t*)(BUFFER_ADDRESS + (y*WIDTH + x)*2 );
 	*addr = colour;
 }
 
@@ -82,16 +82,16 @@ void LCD_Draw_Char_RGB565(uint16_t x,uint16_t y,uint8_t num,uint8_t size,uint8_t
 			else return;
 			for(t1=0;t1<8;t1++)
 			{
-				if(temp&0x80)LCD_Draw_Point_RGB565(x,y,0);
-				else if(mode==0)LCD_Draw_Point_RGB565(x,y,0xffff);
+				if(temp&0x80)		LCD_Draw_Point_RGB565(x,y,0xffff);
+				else if(mode==0) 	LCD_Draw_Point_RGB565(x,y,0x0000);
 				temp<<=1;
 				y++;
-				if(y>=480)return;
+				if(y>=HEIGHT)return;
 				if((y-y0)==size)
 				{
 					y=y0;
 					x++;
-					if(x>=800)return;
+					if(x>=WIDTH)return;
 					break;
 				}
 			}

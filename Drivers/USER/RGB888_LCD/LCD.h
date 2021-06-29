@@ -2,6 +2,10 @@
 #define __LCD_H_
 #include "main.h"
 
+#define WIDTH 			800
+#define HEIGHT			480
+#define BUFFER_ADDRESS	OCTOSPI1_BASE
+
 /* Function */
 void LCD_Clear_DMA2D_RGB888(uint32_t LayerIndex, void *pDst, uint32_t xSize,uint32_t ySize, uint32_t OffLine, uint32_t ColorIndex);
 void LCD_Draw_DMA2D_RGB888(uint32_t LayerIndex, void *pDst, uint32_t xSize,uint32_t ySize, uint32_t OffLine, uint32_t ColorIndex);

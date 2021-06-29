@@ -19,45 +19,41 @@ void DLYB_OCTOSPI1_Calibration(uint8_t phase)
 	DLYB_OCTOSPI1->CFGR &= ( ~ (0xf) );			//设置SEL为12，即使能所有的Delay Unit
 	DLYB_OCTOSPI1->CFGR |= 12;
 
-		for(uint8_t i = 0;i < 128;i ++)
+	for(uint8_t i = 0;i < 128;i ++)
+	{
+		DLYB_OCTOSPI1->CFGR &= ( ~ (0x7f<<8) ); 	//清零UNIT
+		DLYB_OCTOSPI1->CFGR |= (i << 8);			//设置UNIT
+		while( !( (DLYB_OCTOSPI1->CFGR>>31) & 0x01) )		//LNGF被置为1
 		{
-			DLYB_OCTOSPI1->CFGR &= ( ~ (0x7f<<8) ); 	//清零UNIT
-			DLYB_OCTOSPI1->CFGR |= (i << 8);			//设置UNIT
-			while( !( (DLYB_OCTOSPI1->CFGR>>31) & 0x01) )		//LNGF被置为1
+			TimeOut ++;
+			if(TimeOut > 0xffff)
 			{
-				TimeOut ++;
-				if(TimeOut > 0xffff)
-				{
-					//LOG("Time Out\r\n");
-					break;
-				}
+				break;
 			}
-			if( ( (DLYB_OCTOSPI1->CFGR>>31) & 0x01) )			//LNGF被置为1
-			{
-				//LOG("the i is %d\r\n",i);
-				flag = 1;
-			}
-
-			if(flag)
-			{
-				LNGG = (DLYB_OCTOSPI1->CFGR >> 16) & 0xfff;
-				//LOG("LNG is %d\r\n",LNGG);
-				LNG[0] = LNGG & 0x7ff;
-				LNG[1] = (LNGG >> 10) & 0x01;
-				LNG[2] = (LNGG >> 11) & 0x01;
-				if( (LNG[0] > 0) && ( (LNG[1] == 0) || (LNG[2] == 0) ) )	//判断Delay Line Length是否合理
-				{
-					LOG("The Delay Line is set one input clock period\r\n");
-					break;
-				}
-				else
-				{
-					flag = 0;
-					//LOG("The Delay Line is not set one input clock period\r\n");
-				}
-			}
-			else	LOG("The Delay Line is set err\r\n");
 		}
+		if( ( (DLYB_OCTOSPI1->CFGR>>31) & 0x01) )			//LNGF被置为1
+		{
+			flag = 1;
+		}
+
+		if(flag)
+		{
+			LNGG = (DLYB_OCTOSPI1->CFGR >> 16) & 0xfff;
+			LNG[0] = LNGG & 0x7ff;
+			LNG[1] = (LNGG >> 10) & 0x01;
+			LNG[2] = (LNGG >> 11) & 0x01;
+			if( (LNG[0] > 0) && ( (LNG[1] == 0) || (LNG[2] == 0) ) )	//判断Delay Line Length是否合理
+			{
+				LOG("The Delay Line is set one input clock period\r\n");
+				break;
+			}
+			else
+			{
+				flag = 0;
+			}
+		}
+		else	LOG("The Delay Line is set err\r\n");
+	}
 
 
 	/*确定有多少个Unit Delay，跨越一个输入时钟周期*/
@@ -82,6 +78,7 @@ void DLYB_OCTOSPI1_Calibration(uint8_t phase)
 	SET_BIT(OCTOSPI1->CR,OCTOSPI_CR_ABORT);
 	CLEAR_BIT(OCTOSPI1->DCR1,OCTOSPI_DCR1_FRCK);
 }
+
 
 /**
   * @brief  Writes an amount of data from the PSRAM device in polling mode.
@@ -268,8 +265,6 @@ void EnableMemMapped(void)
 
 	/*Disable timeout counter for memory mapped mode*/
 	sMemMappedCfg.TimeOutActivation = HAL_OSPI_TIMEOUT_COUNTER_DISABLE;
-//	sMemMappedCfg.TimeOutActivation	= HAL_OSPI_TIMEOUT_COUNTER_ENABLE;
-//	sMemMappedCfg.TimeOutPeriod		= 1000;
 	/*Enable memory mapped mode*/
 	if (HAL_OSPI_MemoryMapped(&hospi1, &sMemMappedCfg) != HAL_OK)
 	{
@@ -467,6 +462,26 @@ void PsramMapFastRead_U8(uint8_t* buffer, uint32_t addr, uint32_t size)
 	    volatile uint8_t *p_addr		=	(volatile uint8_t *)p_fast_addr;
 	    uint8_t *p_buff					=	(volatile uint8_t *)p_fast_buff;
 	    PsramMapRead_U8(p_buff, p_addr, remains);
+	}
+}
+
+void Psram_Set_DQS(enum DQS_Strength_e DQS_Strength)
+{
+	uint8_t reg[2] = {0x00,0x00};
+	uint8_t regs;
+	switch (DQS_Strength)
+	{
+		case Half			: regs = 0x08; break;
+		case One_Fourth		: regs = 0x09; break;
+		case One_Eighth 	: regs = 0x0A; break;
+		case One_Sixteenth	: regs = 0x0B; break;
+		default				: regs = 0x09; break;
+	}
+	while(reg[0] != regs)
+	{
+		PsramRegWrite(&regs,0);
+		HAL_Delay(50);
+		PsramRegRead(reg,0);
 	}
 }
 

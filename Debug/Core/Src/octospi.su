@@ -1,0 +1,5 @@
+octospi.c:32:6:MX_OCTOSPI1_Init	32	static
+octospi.c:80:6:MX_OCTOSPI2_Init	32	static
+octospi.c:126:6:HAL_OSPI_MspInit	72	static
+octospi.c:247:6:HAL_OSPI_MspDeInit	16	static
+octospi.c:314:6:HAL_OSPI_RxCpltCallback	16	static

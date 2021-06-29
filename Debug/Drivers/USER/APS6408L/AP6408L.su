@@ -1,0 +1,17 @@
+AP6408L.c:5:6:DLYB_OCTOSPI1_Calibration	48	static
+AP6408L.c:89:6:PsramPageWrite	104	static
+AP6408L.c:130:6:PsramPageRead	104	static
+AP6408L.c:165:6:PsramRegRead	96	static
+AP6408L.c:197:6:PsramRegWrite	96	static
+AP6408L.c:229:6:EnableMemMapped	96	static
+AP6408L.c:275:6:PsramMapWrite_U8	32	static
+AP6408L.c:288:6:PsramMapRead_U8	32	static
+AP6408L.c:302:6:PsramMapWrite_U16	32	static
+AP6408L.c:315:6:PsramMapRead_U16	32	static
+AP6408L.c:329:6:PsramMapWrite_U32	32	static
+AP6408L.c:342:6:PsramMapRead_U32	32	static
+AP6408L.c:355:6:PsramMapFastWrite_U8	48	static
+AP6408L.c:384:6:PsramMapFastWrite_U16	48	static
+AP6408L.c:412:6:PsramMapFastWrite_U32	48	static
+AP6408L.c:440:6:PsramMapFastRead_U8	48	static
+AP6408L.c:468:6:Psram_Set_DQS	24	static
